@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>婚礼冲刺 · Vercel</title>
+    <!-- 衬线字体 Playfair Display + 无衬线 Inter (Vercel 风格) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <style>
+        /* ========== Vercel 风格 CSS 变量 ========== */
+        :root {
+            --bg: #fafafa;
+            --card-bg: #ffffff;
+            --border: #eaeaea;
+            --border-light: #f0f0f0;
+            --accent: #0070f3;
+            --accent-hover: #005cc1;
+            --accent-soft: #e8f0fe;
+            --text-primary: #171717;
+            --text-secondary: #444444;
+            --text-muted: #888888;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+            --radius: 24px;
+            --radius-sm: 12px;
+        }
+
+        /* ========== Reset & 基础 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 12px 12px 80px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 手机卡片容器 — 模拟 App 视口 */
+        .app-container {
+            max-width: 420px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            padding: 20px 18px 28px;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+
+        /* ========== 顶部标题区 ========== */
+        .header {
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .header-title {
+            font-family: "Playfair Display", Georgia, serif;
+            font-weight: 600;
+            font-size: 22px;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+        .header-title em {
+            font-style: italic;
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .header-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            margin-top: 2px;
+        }
+
+        /* 倒计时 + 环形进度 行 */
+        .hero-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 14px;
+            gap: 12px;
+        }
+
+        .countdown-block {
+            flex: 1;
+        }
+        .countdown-number {
+            font-family: "Inter", sans-serif;
+            font-weight: 300;
+            font-size: 38px;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            color: var(--text-primary);
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+        }
+        .countdown-number .unit {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin: 0 2px 0 0;
+        }
+        .countdown-number .divider {
+            font-size: 20px;
+            color: var(--border);
+            margin: 0 2px;
+        }
+        .countdown-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            margin-top: 4px;
+        }
+
+        /* 环形进度 SVG */
+        .ring-wrapper {
+            flex-shrink: 0;
+            width: 68px;
+            height: 68px;
+            position: relative;
+        }
+        .ring-wrapper svg {
+            transform: rotate(-90deg);
+            width: 68px;
+            height: 68px;
+        }
+        .ring-wrapper .ring-bg {
+            fill: none;
+            stroke: var(--border-light);
+            stroke-width: 5;
+        }
+        .ring-wrapper .ring-fg {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 5;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.6s ease;
+        }
+        .ring-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        .ring-label small {
+            font-size: 10px;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        /* ========== Tab 导航 (Vercel 风格) ========== */
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            margin: 18px 0 12px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            border: 1px solid var(--border-light);
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            font-family: "Inter", sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            letter-spacing: 0.01em;
+        }
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .tab-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ========== 视图容器 ========== */
+        .view {
+            display: none;
+            animation: fadeUp 0.25s ease;
+        }
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== 通用折叠卡片 (Vercel) ========== */
+        .accordion {
+            background: var(--card-bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            transition: border-color 0.2s;
+        }
+        .accordion-header {
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+            gap: 8px;
+        }
+        .accordion-header:active {
+            background: var(--bg);
+        }
+        .accordion-header .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+        .accordion-header .left .label {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+        .accordion-header .left .badge {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 0 10px;
+            border-radius: 20px;
+            line-height: 22px;
+        }
+        .accordion-header .right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .accordion-header .right .mini-progress {
+            width: 52px;
+            height: 4px;
+            background: var(--border-light);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        .accordion-header .right .mini-progress .fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 99px;
+            transition: width 0.3s;
+        }
+        .accordion-header .right .arrow {
+            font-size: 12px;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+            line-height: 1;
+        }
+        .accordion-header .right .arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .accordion-body {
+            padding: 0 16px 16px;
+            display: none;
+        }
+        .accordion-body.open {
+            display: block;
+        }
+
+        /* ========== 备婚任务列表 ========== */
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            accent-color: var(--accent);
+            cursor: pointer;
+            border-radius: 6px;
+            border: 2px solid var(--border);
+            transition: all 0.15s;
+            appearance: none;
+            -webkit-appearance: none;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .task-item input[type="checkbox"]:checked {
+            background: var(--accent);
+            border-color: var(--accent);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+            background-size: 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .task-item .task-text {
+            flex: 1;
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            padding: 2px 4px;
+            border-radius: 6px;
+            transition: background 0.1s;
+            word-break: break-word;
+            outline: none;
+        }
+        .task-item .task-text.done {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+        .task-item .task-text:focus {
+            background: var(--bg);
+        }
+        .task-item .task-delete {
+            background: none;
+            border: none;
+            color: var(--border);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            transition: color 0.15s;
+            touch-action: manipulation;
+        }
+        .task-item .task-delete:active {
+            color: #e00;
+            transform: scale(0.9);
+        }
+
+        .add-task-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            align-items: center;
+        }
+        .add-task-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: "Inter", sans-serif;
+            background: var(--card-bg);
+            outline: none;
+            transition: border 0.2s;
+            color: var(--text-primary);
+        }
+        .add-task-row input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-soft);
+        }
+        .add-task-row button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: "Inter", sans-serif;
+            touch-action: manipulation;
+            white-space: nowrap;
+        }
+        .add-task-row button:active {
+            transform: scale(0.95);
+            background: var(--accent-hover);
+        }
+
+        /* ========== 减肥打卡 (Vercel 风格) ========== */
+        .fitness-phase {
+            margin-bottom: 4px;
+        }
+        .fitness-phase .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 4px 0 10px;
+        }
+        .fitness-phase .phase-header .phase-label {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+        .fitness-phase .phase-header .phase-progress {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        .fitness-phase .phase-header .phase-note-input {
+            border: none;
+            border-bottom: 1px solid var(--border);
+            background: transparent;
+            font-size: 13px;
+            color: var(--text-muted);
+            padding: 2px 4px;
+            font-family: "Inter", sans-serif;
+            flex: 1;
+            min-width: 100px;
+            transition: border-color 0.2s;
+        }
+        .fitness-phase .phase-header .phase-note-input:focus {
+            outline: none;
+            border-bottom-color: var(--accent);
+        }
+
+        .fitness-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .fitness-day {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-bg);
+            border-radius: var(--radius-sm);
+            padding: 8px 14px 8px 16px;
+            border: 1px solid var(--border-light);
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .fitness-day.today {
+            background: var(--accent-soft);
+            border-color: var(--accent);
+        }
+        .fitness-day .day-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            min-width: 56px;
+        }
+        .fitness-day .day-label .weekday {
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-left: 4px;
+        }
+        .fitness-day .day-btns {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+        .fitness-day .day-btns .dot-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--card-bg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            touch-action: manipulation;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .fitness-day .day-btns .dot-btn:active {
+            transform: scale(0.90);
+        }
+        .fitness-day .day-btns .dot-btn.done {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        .fitness-day .day-btns .dot-btn.done::after {
+            content: "✓";
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .fitness-day .day-btns .dot-btn .label-text {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .fitness-day .day-btns .dot-btn.done .label-text {
+            display: none;
+        }
+        .fitness-day .day-note-input {
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 4px 0;
+            max-width: 80px;
+            font-family: "Inter", sans-serif;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+            flex-shrink: 1;
+            min-width: 40px;
+        }
+        .fitness-day .day-note-input:focus {
+            outline: none;
+            border-bottom-color: var(--border);
+            color: var(--text-primary);
+        }
+        .fitness-day .day-note-input::placeholder {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        /* ========== 空状态 ========== */
+        .empty-hint {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            padding: 30px 0 10px;
+        }
+
+        /* ========== 底部安全区 ========== */
+        .bottom-spacer {
+            height: 8px;
+        }
+
+        /* ========== 响应式微调 ========== */
+        @media (max-width: 440px) {
+            .app-container {
+                padding: 16px 14px 20px;
+                border-radius: 20px;
+            }
+            .header-title {
+                font-size: 20px;
+            }
+            .countdown-number {
+                font-size: 32px;
+            }
+            .ring-wrapper {
+                width: 60px;
+                height: 60px;
+            }
+            .ring-wrapper svg {
+                width: 60px;
+                height: 60px;
+            }
+            .ring-label {
+                font-size: 12px;
+            }
+            .fitness-day {
+                padding: 6px 12px;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .fitness-day .day-label {
+                min-width: 48px;
+                font-size: 13px;
+            }
+            .fitness-day .day-btns .dot-btn {
+                width: 40px;
+                height: 40px;
+            }
+            .fitness-day .day-note-input {
+                max-width: 60px;
+                font-size: 11px;
+            }
+            .task-item .task-text {
+                font-size: 14px;
+            }
+            .tab-btn {
+                font-size: 14px;
+                padding: 8px 0;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .countdown-number {
+                font-size: 26px;
+            }
+            .ring-wrapper {
+                width: 50px;
+                height: 50px;
+            }
+            .ring-wrapper svg {
+                width: 50px;
+                height: 50px;
+            }
+            .ring-label {
+                font-size: 10px;
+            }
+        }
+
+        /* 滚动条美化 (仅桌面) */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 99px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container" id="app">
+
+        <!-- ==================== 顶部 ==================== -->
+        <header class="header">
+            <div class="header-top">
+                <div>
+                    <div class="header-title">💍 婚礼倒计时 <em>· 冲刺手记</em></div>
+                    <div class="header-sub">✨ 每一天都离幸福更近一步</div>
+                </div>
+            </div>
+
+            <!-- 倒计时 + 环形进度 -->
+            <div class="hero-row">
+                <div class="countdown-block">
+                    <div class="countdown-number" id="countdownDisplay">
+                        <span id="cdDays">--</span><span class="unit">天</span>
+                        <span class="divider">·</span>
+                        <span id="cdHours">--</span><span class="unit">时</span>
+                        <span class="divider">·</span>
+                        <span id="cdMins">--</span><span class="unit">分</span>
+                    </div>
+                    <div class="countdown-label">距 2026.10.02 婚礼</div>
+                </div>
+                <div class="ring-wrapper" id="ringWrapper">
+                    <svg viewBox="0 0 68 68">
+                        <circle class="ring-bg" cx="34" cy="34" r="28" />
+                        <circle class="ring-fg" id="ringFg" cx="34" cy="34" r="28"
+                        stroke-dasharray="175.93"
+                        stroke-dashoffset="175.93" />
+                    </svg>
+                    <div class="ring-label" id="ringLabel">0<small>%</small></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==================== Tab 导航 ==================== -->
+        <div class="tab-bar">
+            <button class="tab-btn active" data-view="tasks">📋 备婚</button>
+            <button class="tab-btn" data-view="fitness">🏃 减肥</button>
+        </div>
+
+        <!-- ==================== 视图：备婚 ==================== -->
+        <div class="view active" id="viewTasks">
+            <div id="tasksContainer">
+                <!-- 由 JS 动态渲染 -->
+            </div>
+            <div class="bottom-spacer"></div>
+        </div>
+
+        <!-- ==================== 视图：减肥 ==================== -->
+        <div class="view" id="viewFitness">
+            <div id="fitnessContainer">
+                <!-- 由 JS 动态渲染 -->
+            </div>
+            <div class="bottom-spacer"></div>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            "use strict";
+
+            // =========================== 配置 ===========================
+            const WEDDING_DATE = new Date(2026, 9, 2);
+            const TODAY = new Date();
+            TODAY.setHours(0, 0, 0, 0);
+
+            const PHASE1_START = new Date(2026, 7, 20);
+            const PHASE1_END = new Date(2026, 8, 5);
+            const PHASE2_START = new Date(2026, 8, 7);
+            const PHASE2_END = new Date(2026, 9, 1);
+
+            // =========================== 默认任务数据 ===========================
+            const DEFAULT_TASK_GROUPS = [{
+                id: 'g1',
+                label: '8.20 – 8.23',
+                tasks: [
+                    '完成婚策思路',
+                    '请柬交付',
+                    '科目一完成学习（预约下周考试）',
+                    '给老公买西装（确认是否女方出？）'
+                ]
+            }, {
+                id: 'g2',
+                label: '8.24 – 8.31',
+                tasks: [
+                    '敲定婚策完整内容',
+                    '提车',
+                    '制作婚礼视频',
+                    '送出纸质请柬（邀请伴娘）',
+                    '预约试婚纱【确认妆造、需求】（9.6）',
+                    '通过科目一考试【预计8.26/27】',
+                    '给公公婆婆姑子买衣服（我出）',
+                    '确定五金款式',
+                    '下班练车（科目二）',
+                    '婚车咨询',
+                    'photo booth'
+                ]
+            }, {
+                id: 'g3',
+                label: '9.1 – 9.7',
+                tasks: [
+                    '电子请柬发出（亲友+送戒指）',
+                    '完成喜糖盒选择',
+                    '下班练车（科目二，9.10前考）',
+                    '回家试婚纱',
+                    '回家定酒店',
+                    '回家定餐',
+                    '给爸爸妈妈叔叔阿姨买衣服（老公出）',
+                    '购买女方婚房布置用品（父母协助）',
+                    '确定婚宴预估桌数/喜糖/喜烟/喜酒/干果',
+                    '约婚车',
+                    '男方苗衣服看'
+                ]
+            }, {
+                id: 'g4',
+                label: '9.8 – 9.13',
+                tasks: [
+                    '五金到手',
+                    '购买喜糖/喜烟/喜酒/干果/饮料（男方出）',
+                    '购买男方婚房布置用品（男方出）',
+                    '梳理摄影需求',
+                    '考完科目二，下班练科目三（预计9.20考）',
+                    '伴娘衣服'
+                ]
+            }, {
+                id: 'g5',
+                label: '9.14 – 9.20',
+                tasks: [
+                    '考完科三/科四',
+                    '上牌',
+                    '敬茶跪垫/敬茶杯/敬茶零食',
+                    '确认红包数量、金额',
+                    '准备接亲小游戏',
+                    '买婚礼礼品（女生出）',
+                    '男方伴郎物品（女生买）',
+                    '女生伴手礼（女生出）',
+                    '陪嫁物品单制作'
+                ]
+            }, {
+                id: 'g6',
+                label: '9.20 – 9.25',
+                tasks: [
+                    '差缺补漏',
+                    '复盘婚策内容',
+                    '车上牌',
+                    '绿本',
+                    '中秋回贵州'
+                ]
+            }, {
+                id: 'g7',
+                label: '9.26 – 10.1',
+                tasks: [
+                    '和朋友家人包喜糖、礼品',
+                    '布置女方婚房',
+                    '把东西给男方家布置酒店婚房（10.2-3）'
+                ]
+            }, {
+                id: 'g8',
+                label: '10.2 – 10.3',
+                tasks: [
+                    '🎉 婚礼完美进行'
+                ]
+            }, {
+                id: 'g9',
+                label: '10.4',
+                tasks: [
+                    '🚗 平安返程回深圳'
+                ]
+            }];
+
+            // =========================== 状态 ===========================
+            let state = {
+                fitness: { phase1: {}, phase2: {} },
+                tasks: {}
+            };
+
+            // =========================== 辅助函数 ===========================
+            function formatDate(d) {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
+            }
+
+            function parseDate(str) {
+                const p = str.split('-').map(Number);
+                return new Date(p[0], p[1] - 1, p[2]);
+            }
+
+            function getDateRange(start, end) {
+                const dates = [];
+                const cur = new Date(start);
+                cur.setHours(0, 0, 0, 0);
+                const en = new Date(end);
+                en.setHours(0, 0, 0, 0);
+                while (cur <= en) {
+                    dates.push(new Date(cur));
+                    cur.setDate(cur.getDate() + 1);
+                }
+                return dates;
+            }
+
+            function getWeekday(d) {
+                const map = ['日', '一', '二', '三', '四', '五', '六'];
+                return map[d.getDay()];
+            }
+
+            function generateId() {
+                return 't_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            }
+
+            // =========================== localStorage ===========================
+            function loadState() {
+                try {
+                    const raw = localStorage.getItem('wedding_dashboard_state');
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed.fitness) state.fitness = parsed.fitness;
+                        if (parsed.tasks) state.tasks = parsed.tasks;
+                        // 补全缺失的 group
+                        DEFAULT_TASK_GROUPS.forEach(g => {
+                            if (!state.tasks[g.id]) {
+                                state.tasks[g.id] = {};
+                                g.tasks.forEach(t => {
+                                    const tid = generateId();
+                                    state.tasks[g.id][tid] = { text: t, done: false };
+                                });
+                            } else {
+                                // 如果某个 group 的任务列表为空，补默认
+                                if (Object.keys(state.tasks[g.id]).length === 0 && g.tasks.length > 0) {
+                                    g.tasks.forEach(t => {
+                                        const tid = generateId();
+                                        state.tasks[g.id][tid] = { text: t, done: false };
+                                    });
+                                }
+                            }
+                        });
+                        // 确保每个任务有 text/done
+                        for (let gid in state.tasks) {
+                            for (let tid in state.tasks[gid]) {
+                                if (!state.tasks[gid][tid].hasOwnProperty('text')) {
+                                    state.tasks[gid][tid].text = '未命名';
+                                }
+                                if (!state.tasks[gid][tid].hasOwnProperty('done')) {
+                                    state.tasks[gid][tid].done = false;
+                                }
+                            }
+                        }
+                        // 健身数据补全
+                        if (!state.fitness.phase1) state.fitness.phase1 = {};
+                        if (!state.fitness.phase2) state.fitness.phase2 = {};
+                        return;
+                    }
+                } catch (e) { console.warn('Load state error', e); }
+
+                // 默认初始化
+                state.tasks = {};
+                DEFAULT_TASK_GROUPS.forEach(g => {
+                    state.tasks[g.id] = {};
+                    g.tasks.forEach(t => {
+                        const tid = generateId();
+                        state.tasks[g.id][tid] = { text: t, done: false };
+                    });
+                });
+                state.fitness = { phase1: {}, phase2: {} };
+            }
+
+            function saveState() {
+                try {
+                    localStorage.setItem('wedding_dashboard_state', JSON.stringify(state));
+                } catch (e) {}
+            }
+
+            // =========================== 渲染：倒计时 ===========================
+            function renderCountdown() {
+                const now = new Date();
+                const diff = WEDDING_DATE - now;
+                if (diff <= 0) {
+                    document.getElementById('cdDays').textContent = '🎉';
+                    document.getElementById('cdHours').textContent = '';
+                    document.getElementById('cdMins').textContent = '';
+                    return;
+                }
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('cdDays').textContent = days;
+                document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('cdMins').textContent = String(mins).padStart(2, '0');
+            }
+
+            // =========================== 渲染：环形进度 ===========================
+            function updateRingProgress() {
+                let total = 0,
+                    done = 0;
+                for (let gid in state.tasks) {
+                    for (let tid in state.tasks[gid]) {
+                        total++;
+                        if (state.tasks[gid][tid].done) done++;
+                    }
+                }
+                const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+                const circumference = 175.93;
+                const offset = circumference - (pct / 100) * circumference;
+                document.getElementById('ringFg').style.strokeDashoffset = offset;
+                document.getElementById('ringLabel').innerHTML = pct + '<small>%</small>';
+            }
+
+            // =========================== 渲染：备婚任务 ===========================
+            function renderTasks() {
+                const container = document.getElementById('tasksContainer');
+                if (!container) return;
+
+                let html = '';
+                DEFAULT_TASK_GROUPS.forEach((group, idx) => {
+                    const gid = group.id;
+                    const tasksObj = state.tasks[gid] || {};
+                    const entries = Object.entries(tasksObj);
+                    let done = 0,
+                        total = entries.length;
+                    entries.forEach(([tid, t]) => { if (t.done) done++; });
+                    const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+                    // 判断是否默认展开：今日所在区间
+                    const todayStr = formatDate(TODAY);
+                    let shouldOpen = false;
+                    const ranges = [
+                        { start: '2026-08-20', end: '2026-08-23', id: 'g1' },
+                        { start: '2026-08-24', end: '2026-08-31', id: 'g2' },
+                        { start: '2026-09-01', end: '2026-09-07', id: 'g3' },
+                        { start: '2026-09-08', end: '2026-09-13', id: 'g4' },
+                        { start: '2026-09-14', end: '2026-09-20', id: 'g5' },
+                        { start: '2026-09-20', end: '2026-09-25', id: 'g6' },
+                        { start: '2026-09-26', end: '2026-10-01', id: 'g7' },
+                        { start: '2026-10-02', end: '2026-10-03', id: 'g8' },
+                        { start: '2026-10-04', end: '2026-10-04', id: 'g9' }
+                    ];
+                    const match = ranges.find(r => r.id === gid && todayStr >= r.start && todayStr <= r.end);
+                    if (match) shouldOpen = true;
+                    if (idx === 0 && !shouldOpen) shouldOpen = true;
+
+                    html += `<div class="accordion" data-group="${gid}">
+                        <div class="accordion-header ${shouldOpen ? 'open' : ''}" data-target="${gid}">
+                            <div class="left">
+                                <span class="label">${group.label}</span>
+                                <span class="badge">${done}/${total}</span>
+                            </div>
+                            <div class="right">
+                                <div class="mini-progress"><div class="fill" style="width:${pct}%;"></div></div>
+                                <span class="arrow ${shouldOpen ? 'open' : ''}">▾</span>
+                            </div>
+                        </div>
+                        <div class="accordion-body ${shouldOpen ? 'open' : ''}" id="body_${gid}">
+                            <div class="task-list" data-group="${gid}">
+                                ${entries.map(([tid, t]) => {
+                                    const checked = t.done ? 'checked' : '';
+                                    const doneClass = t.done ? 'done' : '';
+                                    return `<div class="task-item" data-taskid="${tid}">
+                                        <input type="checkbox" ${checked} data-group="${gid}" data-taskid="${tid}" />
+                                        <span class="task-text ${doneClass}" contenteditable="plaintext-only" data-group="${gid}" data-taskid="${tid}">${t.text}</span>
+                                        <button class="task-delete" data-group="${gid}" data-taskid="${tid}">✕</button>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                            <div class="add-task-row">
+                                <input type="text" placeholder="➕ 添加新任务..." data-group="${gid}" />
+                                <button data-group="${gid}">添加</button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                container.innerHTML = html;
+                bindTaskEvents();
+                updateRingProgress();
+            }
+
+            // =========================== 绑定备婚事件 ===========================
+            function bindTaskEvents() {
+                const container = document.getElementById('tasksContainer');
+
+                // 折叠展开
+                container.querySelectorAll('.accordion-header').forEach(h => {
+                    h.onclick = function(e) {
+                        const target = this.dataset.target;
+                        const body = document.getElementById('body_' + target);
+                        const arrow = this.querySelector('.arrow');
+                        const isOpen = body.classList.contains('open');
+                        body.classList.toggle('open');
+                        this.classList.toggle('open');
+                        if (arrow) arrow.classList.toggle('open');
+                    };
+                });
+
+                // checkbox
+                container.querySelectorAll('.task-item input[type="checkbox"]').forEach(cb => {
+                    cb.onchange = function() {
+                        const gid = this.dataset.group;
+                        const tid = this.dataset.taskid;
+                        if (state.tasks[gid] && state.tasks[gid][tid]) {
+                            state.tasks[gid][tid].done = this.checked;
+                            saveState();
+                            const textSpan = this.closest('.task-item').querySelector('.task-text');
+                            if (textSpan) textSpan.classList.toggle('done', this.checked);
+                            renderTasks(); // 刷新 badge & 进度
+                        }
+                    };
+                });
+
+                // 删除
+                container.querySelectorAll('.task-delete').forEach(btn => {
+                    btn.onclick = function(e) {
+                        e.stopPropagation();
+                        const gid = this.dataset.group;
+                        const tid = this.dataset.taskid;
+                        if (state.tasks[gid] && state.tasks[gid][tid]) {
+                            delete state.tasks[gid][tid];
+                            saveState();
+                            renderTasks();
+                        }
+                    };
+                });
+
+                // 添加
+                container.querySelectorAll('.add-task-row button').forEach(btn => {
+                    btn.onclick = function() {
+                        const gid = this.dataset.group;
+                        const input = this.closest('.add-task-row').querySelector('input');
+                        const val = input.value.trim();
+                        if (!val) return;
+                        if (!state.tasks[gid]) state.tasks[gid] = {};
+                        const tid = generateId();
+                        state.tasks[gid][tid] = { text: val, done: false };
+                        saveState();
+                        renderTasks();
+                        input.value = '';
+                    };
+                });
+                container.querySelectorAll('.add-task-row input').forEach(inp => {
+                    inp.onkeydown = function(e) {
+                        if (e.key === 'Enter') this.closest('.add-task-row').querySelector('button').click();
+                    };
+                });
+
+                // 双击编辑 (contenteditable)
+                container.querySelectorAll('.task-text').forEach(el => {
+                    el.onblur = function() {
+                        const gid = this.dataset.group;
+                        const tid = this.dataset.taskid;
+                        const newText = this.innerText.trim();
+                        if (state.tasks[gid] && state.tasks[gid][tid]) {
+                            state.tasks[gid][tid].text = newText || '未命名';
+                            saveState();
+                        }
+                    };
+                    el.onkeydown = function(e) {
+                        if (e.key === 'Enter') { e.preventDefault();
+                            this.blur(); }
+                    };
+                });
+            }
+
+            // =========================== 渲染：减肥打卡 ===========================
+            function renderFitness() {
+                const container = document.getElementById('fitnessContainer');
+                if (!container) return;
+
+                const phases = [{
+                    key: 'phase1',
+                    label: '第一阶段 · 全身燃脂',
+                    sub: '8.20 – 9.5',
+                    start: PHASE1_START,
+                    end: PHASE1_END,
+                    defaultOpen: true,
+                    notePlaceholder: '📝 试纱前全身燃脂...'
+                }, {
+                    key: 'phase2',
+                    label: '第二阶段 · 肩背+核心',
+                    sub: '9.7 – 10.1 (试纱后优化)',
+                    start: PHASE2_START,
+                    end: PHASE2_END,
+                    defaultOpen: false,
+                    notePlaceholder: '📝 重点肩背+肚子...'
+                }];
+
+                let html = '';
+                phases.forEach((phase, idx) => {
+                    const pKey = phase.key;
+                    if (!state.fitness[pKey]) state.fitness[pKey] = {};
+                    const dates = getDateRange(phase.start, phase.end);
+                    let completed = 0;
+                    const total = dates.length * 2;
+
+                    // 收集日期数据
+                    let daysHtml = '';
+                    const todayStr = formatDate(TODAY);
+                    dates.forEach(d => {
+                        const key = formatDate(d);
+                        if (!state.fitness[pKey][key]) {
+                            state.fitness[pKey][key] = { am: false, pm: false, note: '' };
+                        }
+                        const day = state.fitness[pKey][key];
+                        if (day.am) completed++;
+                        if (day.pm) completed++;
+                        const isToday = key === todayStr;
+                        const weekday = getWeekday(d);
+                        const amClass = day.am ? 'done' : '';
+                        const pmClass = day.pm ? 'done' : '';
+                        const month = d.getMonth() + 1;
+                        const dateNum = d.getDate();
+
+                        daysHtml += `
+                            <div class="fitness-day ${isToday ? 'today' : ''}" data-date="${key}" data-phase="${pKey}">
+                                <div class="day-label">${month}/${dateNum} <span class="weekday">${weekday}</span></div>
+                                <div class="day-btns">
+                                    <button class="dot-btn ${amClass}" data-phase="${pKey}" data-date="${key}" data-slot="am">
+                                        <span class="label-text">早</span>
+                                    </button>
+                                    <button class="dot-btn ${pmClass}" data-phase="${pKey}" data-date="${key}" data-slot="pm">
+                                        <span class="label-text">晚</span>
+                                    </button>
+                                </div>
+                                <input class="day-note-input" type="text" placeholder="备注" data-phase="${pKey}" data-date="${key}" value="${day.note || ''}" />
+                            </div>
+                        `;
+                    });
+
+                    const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
+                    const shouldOpen = phase.defaultOpen;
+
+                    // 恢复 note 全局
+                    const noteKey = pKey + '_note';
+                    const globalNote = state.fitness[pKey]._note || phase.notePlaceholder;
+
+                    html += `
+                        <div class="fitness-phase" data-phase="${pKey}">
+                            <div class="accordion" style="border-color:var(--border-light);">
+                                <div class="accordion-header ${shouldOpen ? 'open' : ''}" data-target="${pKey}_body">
+                                    <div class="left">
+                                        <span class="phase-label">${phase.label}</span>
+                                        <span class="badge">${completed}/${total}</span>
+                                    </div>
+                                    <div class="right">
+                                        <div class="mini-progress"><div class="fill" style="width:${pct}%;"></div></div>
+                                        <span class="arrow ${shouldOpen ? 'open' : ''}">▾</span>
+                                    </div>
+                                </div>
+                                <div class="accordion-body ${shouldOpen ? 'open' : ''}" id="${pKey}_body">
+                                    <div class="phase-header">
+                                        <span class="phase-progress">📅 ${phase.sub}</span>
+                                        <input class="phase-note-input" type="text" placeholder="📝 阶段备注..." data-phase="${pKey}" value="${globalNote}" />
+                                    </div>
+                                    <div class="fitness-grid" data-phase="${pKey}">
+                                        ${daysHtml}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+                bindFitnessEvents();
+            }
+
+            // =========================== 绑定减肥事件 ===========================
+            function bindFitnessEvents() {
+                const container = document.getElementById('fitnessContainer');
+
+                // 折叠展开
+                container.querySelectorAll('.accordion-header').forEach(h => {
+                    h.onclick = function(e) {
+                        const target = this.dataset.target;
+                        const body = document.getElementById(target);
+                        const arrow = this.querySelector('.arrow');
+                        const isOpen = body.classList.contains('open');
+                        body.classList.toggle('open');
+                        this.classList.toggle('open');
+                        if (arrow) arrow.classList.toggle('open');
+                    };
+                });
+
+                // 打卡按钮
+                container.querySelectorAll('.dot-btn').forEach(btn => {
+                    btn.onclick = function(e) {
+                        e.stopPropagation();
+                        const phase = this.dataset.phase;
+                        const date = this.dataset.date;
+                        const slot = this.dataset.slot;
+                        if (!state.fitness[phase]) state.fitness[phase] = {};
+                        if (!state.fitness[phase][date]) {
+                            state.fitness[phase][date] = { am: false, pm: false, note: '' };
+                        }
+                        state.fitness[phase][date][slot] = !state.fitness[phase][date][slot];
+                        saveState();
+                        renderFitness();
+                        updateRingProgress();
+                    };
+                });
+
+                // 备注输入 (日期级别)
+                container.querySelectorAll('.day-note-input').forEach(inp => {
+                    inp.onchange = function() {
+                        const phase = this.dataset.phase;
+                        const date = this.dataset.date;
+                        if (!state.fitness[phase]) state.fitness[phase] = {};
+                        if (!state.fitness[phase][date]) {
+                            state.fitness[phase][date] = { am: false, pm: false, note: '' };
+                        }
+                        state.fitness[phase][date].note = this.value;
+                        saveState();
+                    };
+                });
+
+                // 阶段备注
+                container.querySelectorAll('.phase-note-input').forEach(inp => {
+                    inp.onchange = function() {
+                        const phase = this.dataset.phase;
+                        if (state.fitness[phase]) {
+                            state.fitness[phase]._note = this.value;
+                            saveState();
+                        }
+                    };
+                });
+            }
+
+            // =========================== Tab 切换 ===========================
+            function initTabs() {
+                const tabs = document.querySelectorAll('.tab-btn');
+                const views = {
+                    tasks: document.getElementById('viewTasks'),
+                    fitness: document.getElementById('viewFitness')
+                };
+
+                tabs.forEach(btn => {
+                    btn.onclick = function() {
+                        tabs.forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        const view = this.dataset.view;
+                        Object.keys(views).forEach(key => {
+                            views[key].classList.toggle('active', key === view);
+                        });
+                    };
+                });
+            }
+
+            // =========================== 初始化 ===========================
+            function init() {
+                loadState();
+                renderCountdown();
+                renderTasks();
+                renderFitness();
+                initTabs();
+                updateRingProgress();
+
+                setInterval(() => {
+                    renderCountdown();
+                }, 60000);
+            }
+
+            if (document.readyState === 'complete') {
+                init();
+            } else {
+                window.addEventListener('load', init);
+            }
+
+        })();
+    </script>
+
+</body>
+</html>
